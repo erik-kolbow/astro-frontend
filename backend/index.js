@@ -7,12 +7,12 @@ const { SearchClient, AzureKeyCredential } = require('@azure/search-documents');
 dotenv.config();
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
 
-// 🧠 Azure Cognitive Search query
+// 🔍 Azure Cognitive Search
 async function getChunksFromSearch(query) {
   const endpoint = process.env.COGNITIVE_SEARCH_ENDPOINT;
   const indexName = process.env.COGNITIVE_SEARCH_INDEX;
@@ -37,30 +37,34 @@ async function getChunksFromSearch(query) {
 app.post('/api/ask', async (req, res) => {
   try {
     const userMessage = req.body.message || "";
+
+    // 🔍 Cognitive Search grounding
     const knowledgeChunks = await getChunksFromSearch(userMessage);
+    const context = knowledgeChunks.join('\n\n').slice(0, 4000);
+
     console.log("🔍 Knowledge chunks returned:", knowledgeChunks.length);
-console.log("🔍 Injecting context into GPT:\n", knowledgeChunks.join('\n\n').slice(0, 4000));
+    console.log("🔍 Injecting context into GPT:\n", context);
 
-    const context = knowledgeChunks.join('\n\n').slice(0, 4000); // Trim for token safety
-
-    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=${process.env.OPENAI_API_VERSION}`);
-
+    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=2025-01-01-preview`);
 
     const body = JSON.stringify({
-  messages: [
-    {
-      role: "system",
-      content: `You are Astro, an empathetic AI guide who supports individuals and families with invisible wounds using the BARC Method. Use the following context from Erik's BARC knowledge base:\n\n${context}`
-    },
-    {
-      role: "user",
-      content: userMessage
-    }
-  ],
-  max_tokens: 600,
-  temperature: 0.7
-});
+      messages: [
+        {
+          role: "system",
+          content: `You are Astro, an empathetic AI guide trained by Erik Kolbow to support individuals with invisible wounds using the BARC Method. Always respond using the knowledge provided below.
 
+This user asked: "${userMessage}"
+
+Use the following context to help answer them accurately:\n\n${context}`
+        },
+        {
+          role: "user",
+          content: userMessage
+        }
+      ],
+      max_tokens: 600,
+      temperature: 0.7
+    });
 
     const accessToken = {
       token: process.env.OPENAI_API_KEY
@@ -112,12 +116,7 @@ console.log("🔍 Injecting context into GPT:\n", knowledgeChunks.join('\n\n').s
   }
 });
 
-app.get('/api/userdata/:email', async (req, res) => {
-  res.json({ message: "This endpoint is not yet wired for CosmosDB queries." });
+app.listen(port, () => {
+  console.log(`✅ AstroGPT backend running on port ${port}`);
 });
-
-app.listen(process.env.PORT || 3001, () => {
-  console.log(`✅ AstroGPT backend running on port ${process.env.PORT || 3001}`);
-});
-
 
