@@ -1,0 +1,98 @@
+.barc-loop-box {
+  border: 2px solid #007bff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  background: #e6f6ff;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.barc-logo-header {
+  text-align: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.barc-logo {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.barc-logo-header h2 {
+  margin: 0.25rem 0 0;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.barc-tagline {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #333;
+  margin-top: 0.2rem;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #ff4d4d;
+}
+
+.barc-loop-title {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  gap: 0.5rem;
+}
+
+.barc-loop-title input {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.barc-loop-columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.barc-box {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.barc-box textarea {
+  resize: vertical;
+  height: 100px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.arrow {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  color: #007bff;
+}
+
+.barc-loop-footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 1rem;
+}
+
