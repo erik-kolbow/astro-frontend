@@ -40,7 +40,7 @@ app.post('/api/ask', async (req, res) => {
     const knowledgeChunks = await getChunksFromSearch(userMessage);
     const context = knowledgeChunks.join('\n\n').slice(0, 4000); // Trim for token safety
 
-    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-03-01`);
+    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=2025-01-01-preview`);
 
     const body = JSON.stringify({
       messages: [
