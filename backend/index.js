@@ -111,7 +111,8 @@ app.get('/api/userdata/:email', async (req, res) => {
   res.json({ message: "This endpoint is not yet wired for CosmosDB queries." });
 });
 
-app.listen(port, () => {
-  console.log(`✅ AstroGPT backend running at http://localhost:${port}`);
+app.listen(process.env.PORT || 3001, () => {
+  console.log(`✅ AstroGPT backend running on port ${process.env.PORT || 3001}`);
 });
+
 
