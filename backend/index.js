@@ -12,7 +12,7 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// 🔍 Azure Cognitive Search
+// 🔎 Azure Cognitive Search
 async function getChunksFromSearch(query) {
   const endpoint = process.env.COGNITIVE_SEARCH_ENDPOINT;
   const indexName = process.env.COGNITIVE_SEARCH_INDEX;
@@ -37,10 +37,8 @@ async function getChunksFromSearch(query) {
 app.post('/api/ask', async (req, res) => {
   try {
     const userMessage = req.body.message || "";
-
-    // 🔍 Cognitive Search grounding
     const knowledgeChunks = await getChunksFromSearch(userMessage);
-    const context = knowledgeChunks.join('\n\n').slice(0, 4000);
+    const context = knowledgeChunks.join('\n\n').slice(0, 4000); // Trim to fit token limits
 
     console.log("🔍 Knowledge chunks returned:", knowledgeChunks.length);
     console.log("🔍 Injecting context into GPT:\n", context);
@@ -51,11 +49,15 @@ app.post('/api/ask', async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `You are Astro, an empathetic AI guide trained by Erik Kolbow to support individuals with invisible wounds using the BARC Method. Always respond using the knowledge provided below.
+          content: `You are Astro, an empathetic AI assistant created by Erik Kolbow to help individuals and their loved ones navigate invisible wounds using the BARC Method.
 
-This user asked: "${userMessage}"
+The user asked: "${userMessage}"
 
-Use the following context to help answer them accurately:\n\n${context}`
+Your job is to answer their question clearly and supportively using the information below. Focus only on relevant pieces of the knowledge. If the user's question is about something like "the 3 T's," and the chunks below include Teach, Train, and Test — use that directly in your reply.
+
+NEVER respond generically or ask “how can I help?” unless no relevant knowledge exists. Instead, use what's below.
+
+Knowledge base:\n\n${context}`
         },
         {
           role: "user",
@@ -66,15 +68,11 @@ Use the following context to help answer them accurately:\n\n${context}`
       temperature: 0.7
     });
 
-    const accessToken = {
-      token: process.env.OPENAI_API_KEY
-    };
-
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': accessToken.token
+        'api-key': process.env.OPENAI_API_KEY
       }
     };
 
@@ -114,6 +112,11 @@ Use the following context to help answer them accurately:\n\n${context}`
       reply: "Astro hit a snag reaching the brain — can you try again?"
     });
   }
+});
+
+// Simple test endpoint
+app.get('/api/userdata/:email', async (req, res) => {
+  res.json({ message: "User data route placeholder." });
 });
 
 app.listen(port, () => {
