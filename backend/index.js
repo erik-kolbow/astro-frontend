@@ -38,24 +38,29 @@ app.post('/api/ask', async (req, res) => {
   try {
     const userMessage = req.body.message || "";
     const knowledgeChunks = await getChunksFromSearch(userMessage);
+    console.log("🔍 Knowledge chunks returned:", knowledgeChunks.length);
+console.log("🔍 Injecting context into GPT:\n", knowledgeChunks.join('\n\n').slice(0, 4000));
+
     const context = knowledgeChunks.join('\n\n').slice(0, 4000); // Trim for token safety
 
-    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=2025-01-01-preview`);
+    const url = new URL(`${process.env.OPENAI_API_URL}/openai/deployments/${process.env.OPENAI_DEPLOYMENT}/chat/completions?api-version=${process.env.OPENAI_API_VERSION}`);
+
 
     const body = JSON.stringify({
-      messages: [
-        {
-          role: "system",
-          content: `You are Astro, an empathetic AI guide who supports individuals and families with invisible wounds using the BARC Method. Speak at a 5th grade level. Respond warmly, supportively, and with compassion.\n\nUse this knowledge:\n\n${context}`
-        },
-        {
-          role: "user",
-          content: userMessage
-        }
-      ],
-      max_tokens: 600,
-      temperature: 0.7
-    });
+  messages: [
+    {
+      role: "system",
+      content: `You are Astro, an empathetic AI guide who supports individuals and families with invisible wounds using the BARC Method. Use the following context from Erik's BARC knowledge base:\n\n${context}`
+    },
+    {
+      role: "user",
+      content: userMessage
+    }
+  ],
+  max_tokens: 600,
+  temperature: 0.7
+});
+
 
     const accessToken = {
       token: process.env.OPENAI_API_KEY
