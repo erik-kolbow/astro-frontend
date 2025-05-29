@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import "../App.css";
+import "../App.css"; // corrected path
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function ChatWidget() {
       );
       setMessages((prev) => [
         ...prev,
-        { text: res.data.response, sender: "bot" },
+        { text: res.data.reply, sender: "bot" },
       ]);
     } catch (err) {
       setMessages((prev) => [
