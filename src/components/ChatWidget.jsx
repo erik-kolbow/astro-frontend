@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import "../App.css";
+import "./App.css";
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,7 +9,7 @@ export default function ChatWidget() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen]);
@@ -20,16 +20,23 @@ export default function ChatWidget() {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    console.log("Sending message to GPT backend:", input);
+
     setMessages((prev) => [...prev, { text: input, sender: "user" }]);
     setInput("");
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/ask`, {
-, {
-, {
-        message: input,
-      });
-      setMessages((prev) => [...prev, { text: res.data.response, sender: "bot" }]);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/ask`,
+        {
+          message: input,
+        }
+      );
+      setMessages((prev) => [
+        ...prev,
+        { text: res.data.response, sender: "bot" },
+      ]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -67,120 +74,66 @@ export default function ChatWidget() {
           />
         </div>
       )}
+
       {isOpen && (
         <div
           style={{
             position: "fixed",
             bottom: "20px",
             right: "20px",
-            width: "400px",
-            height: "500px",
-            background: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-            zIndex: 1000,
+            width: "350px",
+            maxHeight: "500px",
+            backgroundColor: "#fff",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
             display: "flex",
             flexDirection: "column",
-            overflow: "hidden",
-            fontFamily: "Arial, sans-serif",
+            zIndex: 1001,
           }}
         >
-          <div
-            style={{
-              background: "#1E73BE",
-              color: "#fff",
-              padding: "12px 16px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "bold",
-            }}
-          >
+          <div style={{ padding: "10px", fontWeight: "bold", backgroundColor: "#007bff", color: "#fff", borderTopLeftRadius: "8px", borderTopRightRadius: "8px" }}>
             Ask Astro
-            <button
-              onClick={toggleChat}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                fontSize: "20px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-              aria-label="Close chat"
-            >
-              &times;
-            </button>
+            <span style={{ float: "right", cursor: "pointer" }} onClick={toggleChat}>×</span>
           </div>
-
           <div
             style={{
-              flexGrow: 1,
-              padding: "20px",
+              flex: 1,
               overflowY: "auto",
-              backgroundColor: "#f8f8f8",
+              padding: "10px",
+              backgroundColor: "#f9f9f9",
             }}
           >
-            {messages.map((m, i) => (
+            {messages.map((msg, index) => (
               <div
-                key={i}
+                key={index}
                 style={{
-                  maxWidth: "80%",
-                  marginBottom: "10px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  lineHeight: 1.5,
-                  fontSize: "16px",
-                  whiteSpace: "pre-wrap",
-                  backgroundColor: m.sender === "user" ? "#d0f0ff" : "#fff",
-                  alignSelf: m.sender === "user" ? "flex-end" : "flex-start",
-                  textAlign: m.sender === "user" ? "right" : "left",
-                  border: m.sender === "bot" ? "1px solid #ccc" : "none",
+                  backgroundColor: msg.sender === "user" ? "#e0f7fa" : "#eee",
+                  padding: "8px",
+                  marginBottom: "6px",
+                  borderRadius: "6px",
+                  alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
                 }}
               >
-                {m.text}
+                {msg.sender === "user" ? "You: " : "Astro: "} {msg.text}
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              padding: "10px",
-              borderTop: "1px solid #ccc",
-              backgroundColor: "#fff",
-            }}
-          >
+          <div style={{ padding: "10px", display: "flex", gap: "8px" }}>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
               placeholder="Talk to Astro..."
-              style={{
-                flex: 1,
-                padding: "10px",
-                fontSize: "16px",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-              }}
+              style={{ flex: 1, padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
             />
-            <button
-              onClick={sendMessage}
-              style={{
-                marginLeft: "10px",
-                padding: "10px 20px",
-                fontSize: "16px",
-                backgroundColor: "#4caf50",
-                color: "#fff",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
+            <button onClick={sendMessage} style={{ padding: "8px 12px", backgroundColor: "#28a745", color: "#fff", border: "none", borderRadius: "4px" }}>
               Send
             </button>
+          </div>
+          <div style={{ padding: "6px 10px", fontSize: "12px", color: "#999", textAlign: "center" }}>
+            Not a medical or therapeutic replacement.
           </div>
         </div>
       )}
