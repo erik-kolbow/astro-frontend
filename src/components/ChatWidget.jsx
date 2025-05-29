@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import "./App.css";
+import "../App.css";
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
